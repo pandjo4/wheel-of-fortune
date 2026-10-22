@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="bs">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#101021"><title>Kolo sreće — Party igra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#101021;--panel:#19192e;--panel2:#22223b;--line:#343451;--text:#f8f7ff;--muted:#a5a4c3;--gold:#ffd166;--pink:#ff4d8d;--cyan:#55e6d0;--purple:#8b7cff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#34305f 0,transparent 52%),var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer;border:0;transition:transform .15s,filter .15s}button:active{transform:scale(.97)}button:disabled{opacity:.35;cursor:not-allowed;filter:grayscale(.6)}.hidden{display:none!important}.wrap{width:min(1100px,100%);margin:auto;padding:18px 16px 40px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:11px}.logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(145deg,var(--gold),#ff9e4a);display:grid;place-items:center;color:#29203e;font-size:24px;box-shadow:0 8px 30px #ffd16635}.brand b{font:700 19px 'Space Grotesk';letter-spacing:-.5px}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:2px}.pill{border:1px solid var(--line);border-radius:99px;padding:8px 12px;color:var(--muted);font-size:12px}.screen{animation:rise .3s ease}@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}.hero{text-align:center;padding:38px 0 26px}.eyebrow{color:var(--cyan);font-weight:800;letter-spacing:3px;font-size:11px;text-transform:uppercase}.hero h1{font:700 clamp(36px,8vw,66px)/.98 'Space Grotesk';margin:15px 0;background:linear-gradient(100deg,#fff 10%,#ffd166 50%,#ff7eae 90%);background-clip:text;-webkit-background-clip:text;color:transparent;letter-spacing:-2px}.hero p{color:var(--muted);max-width:450px;margin:0 auto;line-height:1.6}.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:760px;margin:12px auto}.card{background:linear-gradient(150deg,#20203a,#17172a);border:1px solid var(--line);border-radius:23px;padding:22px;box-shadow:0 18px 45px #0002}.card h2{font:700 19px 'Space Grotesk';margin:0 0 7px}.card p{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 17px}.field-label{display:block;color:#c9c8e0;font-size:12px;font-weight:700;margin:14px 0 7px}.field{width:100%;border:1px solid #41415f;background:#111125;color:#fff;border-radius:12px;padding:13px 14px;outline:none}.field:focus{border-color:var(--purple);box-shadow:0 0 0 3px #8b7cff22}.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}.choice{background:#111125;color:#b7b6d2;border:1px solid #41415f;border-radius:12px;padding:12px;font-weight:800}.choice.active{border-color:var(--gold);background:#ffd16615;color:var(--gold)}.btn{padding:13px 17px;border-radius:13px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn-primary{background:linear-gradient(100deg,var(--gold),#ffad5b);color:#28213b;box-shadow:0 7px 24px #ffd16622}.btn-secondary{background:#2a2948;color:#f6f4ff;border:1px solid #474568}.btn-cyan{background:var(--cyan);color:#10272b}.btn-wide{width:100%;margin-top:14px}.mini-note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5}.rules{max-width:760px;margin:18px auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.rule{border:1px solid var(--line);background:#18182b99;padding:15px;border-radius:16px}.rule strong{display:block;font-size:13px;margin:8px 0 5px}.rule span{font-size:12px;color:var(--muted);line-height:1.45}.rule-icon{font-size:22px}.lobby-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.codebox{font:700 26px 'Space Grotesk';letter-spacing:5px;color:var(--gold);background:#101022;border:1px dashed #5d557a;padding:10px 16px;border-radius:13px;user-select:all}.players{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}.player-tile{border:1px solid var(--line);background:#111125;border-radius:16px;padding:15px;min-height:95px}.player-tile .avatar{width:35px;height:35px;display:grid;place-items:center;border-radius:12px;background:#343052;font-size:17px;margin-bottom:9px}.player-tile b{font-size:13px}.player-tile small{display:block;color:var(--muted);font-size:11px;margin-top:4px}.player-tile.empty{border-style:dashed;display:grid;place-items:center;text-align:center;color:#6d6c8c;font-size:12px}.lobby-info{background:#111125;border-radius:14px;padding:15px;color:var(--muted);font-size:13px;line-height:1.55}.game-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(270px,.7fr);gap:16px;align-items:start}.game-main,.side{display:grid;gap:14px}.roundbar{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}.roundbar b{color:var(--gold)}.turn-banner{padding:13px 15px;background:#2a2547;border:1px solid #4b4376;border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px}.turn-banner strong{color:var(--gold)}.puzzle-card{padding:20px 15px 24px;text-align:center}.category{display:inline-block;color:var(--cyan);font-size:11px;letter-spacing:2px;font-weight:800;text-transform:uppercase;margin-bottom:17px}.board{display:flex;flex-wrap:wrap;justify-content:center;gap:5px 5px;max-width:650px;margin:auto}.word{display:flex;gap:4px;margin:0 7px 8px 0}.tile{width:clamp(19px,4.7vw,39px);height:clamp(34px,8vw,51px);border-radius:6px;background:#f0f1ff;color:#25213b;display:grid;place-items:center;font:700 clamp(15px,3.5vw,23px) 'Space Grotesk';box-shadow:inset 0 -4px #c7c8e7}.tile.blank{background:#343351;color:transparent;box-shadow:inset 0 -4px #24233e;border:1px solid #4b496e}.tile.space{width:clamp(7px,2vw,16px);background:transparent;box-shadow:none}.tile.revealed{animation:flip .25s ease}@keyframes flip{from{transform:rotateX(80deg)}to{transform:none}}.wheel-panel{text-align:center}.wheel-wrap{position:relative;width:min(290px,75vw);aspect-ratio:1;margin:0 auto 14px}.wheel{width:100%;height:100%;border-radius:50%;border:7px solid #f4d98b;box-shadow:0 0 0 5px #2b254a,0 15px 35px #0006;transition:transform 2.8s cubic-bezier(.12,.76,.12,1);background:conic-gradient(#f6c453 0 30deg,#29c4b7 30deg 60deg,#ef476f 60deg 90deg,#7c6cf2 90deg 120deg,#38a3ff 120deg 150deg,#ff8a4c 150deg 180deg,#f6c453 180deg 210deg,#29c4b7 210deg 240deg,#7c6cf2 240deg 270deg,#38a3ff 270deg 300deg,#ef476f 300deg 330deg,#ff8a4c 330deg 360deg);position:relative;overflow:hidden}.wheel:after{content:"";position:absolute;inset:35%;border-radius:50%;background:#17172c;border:4px solid #f5d98a;box-shadow:0 2px 8px #0007}.wheel-labels{position:absolute;inset:0;pointer-events:none}.wheel-labels span{position:absolute;left:50%;top:50%;font-size:10px;font-weight:900;color:#161426;width:70px;margin-left:-35px;text-align:center;transform-origin:50% 0}.pointer{position:absolute;z-index:2;left:50%;top:-9px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:28px solid #fff;filter:drop-shadow(0 3px 2px #0008)}.wheel-result{font:700 21px 'Space Grotesk';color:var(--gold);min-height:28px}.wheel-caption{font-size:12px;color:var(--muted);margin:4px 0 14px}.action-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.keyboard{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.key{min-height:39px;border-radius:9px;background:#30304e;color:#f6f5ff;border:1px solid #464665;font-weight:800;font-size:14px}.key.vowel{color:var(--cyan)}.key:disabled{background:#19192c;color:#5e5d7a;border-color:#292943;opacity:1}.keyboard-note{font-size:11px;color:var(--muted);margin:0 0 10px}.solve-row{display:flex;gap:7px}.solve-row .field{min-width:0}.solve-row .btn{white-space:nowrap;padding:0 12px}.scores{display:grid;gap:8px}.score-row{display:flex;align-items:center;gap:10px;background:#111125;border:1px solid var(--line);border-radius:13px;padding:11px}.score-row.current{border-color:var(--gold);background:#ffd1660c}.score-avatar{width:34px;height:34px;flex:0 0 34px;border-radius:11px;background:#353153;display:grid;place-items:center}.score-name{font-size:12px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}.score-points{font:700 17px 'Space Grotesk';color:var(--gold)}.status{font-size:13px;color:#d7d5ee;line-height:1.5;padding:14px;background:#111125;border-radius:13px;border:1px solid var(--line);min-height:65px}.status b{color:var(--cyan)}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:20;background:#ff4d8d;color:white;font-size:13px;font-weight:700;padding:12px 17px;border-radius:12px;box-shadow:0 8px 30px #0005;max-width:90%;text-align:center}.modal{position:fixed;inset:0;background:#080814d9;display:grid;place-items:center;padding:20px;z-index:10}.modal-card{width:min(420px,100%);background:#20203a;border:1px solid #494767;border-radius:24px;padding:26px;text-align:center;box-shadow:0 25px 80px #0008}.modal-card h2{font:700 29px 'Space Grotesk';margin:8px 0}.modal-answer{color:var(--gold);font:700 21px 'Space Grotesk';margin:15px 0;letter-spacing:1px}.final-list{display:grid;gap:9px;margin:18px 0;text-align:left}.final-item{display:flex;justify-content:space-between;background:#111125;border-radius:12px;padding:13px}.foot{text-align:center;color:#696987;font-size:11px;margin:26px 0 0}
+@media(max-width:700px){.wrap{padding:14px 12px 28px}.top{margin-bottom:8px}.hero{padding:29px 0 20px}.home-grid{grid-template-columns:1fr;gap:12px}.card{padding:19px}.rules{grid-template-columns:1fr;gap:8px}.rule{display:flex;gap:12px;align-items:center;padding:12px}.rule-icon{font-size:23px}.rule strong{margin:0 0 3px}.players{gap:7px}.player-tile{padding:11px;min-height:90px}.game-layout{grid-template-columns:1fr}.side{grid-row:1}.game-main{grid-row:2}.wheel-wrap{width:min(270px,72vw)}.keyboard{grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.key{min-height:39px}.game-layout .card{border-radius:18px}.brand b{font-size:17px}.pill{font-size:10px;padding:7px 9px}.puzzle-card{padding:18px 8px 22px}.tile{width:clamp(18px,5.2vw,32px);height:38px}.word{gap:3px;margin-right:5px}.score-row{padding:9px}.score-points{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div class="brand"><div class="logo">✦</div><div><b>KOLO SREĆE</b><small>online party game</small></div></div><div class="pill" id="connection">● Spajanje...</div></header>
+<main id="home" class="screen">
+<section class="hero"><div class="eyebrow">Zavrti. Pogodi. Pobijedi.</div><h1>KOLO SREĆE</h1><p>Pronađi skrivenu frazu, osvoji bodove i nadmudri ekipu. Za 2 ili 3 igrača — svaki potez može promijeniti sve.</p></section>
+<div class="home-grid">
+<section class="card"><h2>✦ Napravi sobu</h2><p>Ti si domaćin. Izaberi broj igrača i pošalji kod prijateljima.</p>
+<label class="field-label" for="createName">Tvoje ime</label><input class="field" id="createName" maxlength="18" placeholder="Npr. Samir">
+<label class="field-label">Broj igrača</label><div class="choices"><button class="choice active" data-count="2">2 igrača</button><button class="choice" data-count="3">3 igrača</button></div>
+<button class="btn btn-primary btn-wide" id="createBtn">＋ Napravi sobu</button><div class="mini-note">Igra počinje kada se pridruži tačan broj igrača.</div></section>
+<section class="card"><h2>↗ Pridruži se</h2><p>Unesi kod sobe koji ti je poslao prijatelj.</p>
+<label class="field-label" for="joinName">Tvoje ime</label><input class="field" id="joinName" maxlength="18" placeholder="Kako da te zovemo?">
+<label class="field-label" for="roomCode">Kod sobe</label><input class="field" id="roomCode" maxlength="5" placeholder="ABCDE" style="text-transform:uppercase;letter-spacing:4px;font-weight:800">
+<button class="btn btn-cyan btn-wide" id="joinBtn">Pridruži se sobi →</button><div class="mini-note">Radi na mobitelima. Svi igrači koriste isti kod sobe.</div></section>
+</div>
+<section class="rules"><div class="rule"><div class="rule-icon">🎡</div><div><strong>Zavrti kolo</strong><span>Osvoji 100–500 bodova, dupliraj dobitak ili rizikuj bankrot.</span></div></div><div class="rule"><div class="rule-icon">🔤</div><div><strong>Pogodi slova</strong><span>Tačan suglasnik donosi bodove za svako pojavljivanje u frazi.</span></div></div><div class="rule"><div class="rule-icon">🏆</div><div><strong>Riješi frazu</strong><span>Tačno rješenje donosi bonus od 500 bodova. Igra traje 5 rundi.</span></div></div></section>
+<div class="foot">NAPRAVLJENO ZA DRUŠTVO · BHS FRAZE · 2–3 IGRAČA</div>
+</main>
+<section id="lobby" class="screen hidden">
+<div class="card"><div class="lobby-head"><div><div class="eyebrow">Soba za igru</div><h2 style="margin-top:7px">Pozovi svoju ekipu</h2></div><div class="codebox" id="lobbyCode">-----</div></div>
+<p style="color:var(--muted);font-size:13px;line-height:1.5">Podijeli kod sobe s prijateljima. Kada se pridruže svi igrači, domaćin može pokrenuti igru.</p>
+<div class="players" id="lobbyPlayers"></div><div class="lobby-info" id="lobbyInfo">Čeka se igrače...</div><button class="btn btn-primary btn-wide" id="startBtn">🎮 Pokreni igru</button><button class="btn btn-secondary btn-wide" id="copyBtn">Kopiraj kod sobe</button><button class="btn btn-secondary btn-wide" id="leaveBtn">← Nazad na početak</button></div>
+</section>
+<section id="game" class="screen hidden">
+<div class="roundbar"><span>RUNDA <b id="roundNum">1</b> / 5</span><span id="roomTag">SOBA -----</span></div>
+<div class="game-layout" style="margin-top:12px">
+<div class="game-main">
+<div class="turn-banner"><span>🎯 Na potezu: <strong id="turnName">—</strong></span><span id="turnBadge">ČEKAJ</span></div>
+<div class="card puzzle-card"><div class="category" id="category">KATEGORIJA</div><div class="board" id="board"></div></div>
+<div class="card"><div class="roundbar" style="margin-bottom:12px"><span>IZABERI SUGLASNIK</span><span class="pill">A E I O U = samoglasnici</span></div><p class="keyboard-note">Prvo zavrti kolo. Samoglasnik možeš kupiti za 250 bodova.</p><div class="keyboard" id="keyboard"></div><div style="height:15px"></div><div class="solve-row"><input class="field" id="solveInput" placeholder="Ili upiši cijelu frazu..." autocomplete="off"><button class="btn btn-cyan" id="solveBtn">Riješi</button></div></div>
+</div>
+<aside class="side">
+<div class="card wheel-panel"><div class="roundbar" style="margin-bottom:15px"><span>🎡 KOLO BODOVA</span><span class="pill">SREĆA?</span></div><div class="wheel-wrap"><div class="pointer"></div><div class="wheel" id="wheel"></div><div class="wheel-labels" id="wheelLabels"></div></div><div class="wheel-result" id="wheelResult">Tvoj potez!</div><div class="wheel-caption" id="wheelCaption">Zavrti kolo da započneš.</div><button class="btn btn-primary btn-wide" id="spinBtn">⟳ Zavrti kolo</button><div class="action-row" style="margin-top:8px"><button class="btn btn-secondary" id="buyBtn">Kupи samoglasnik · 250</button><button class="btn btn-secondary" id="passBtn">Odustani od poteza</button></div></div>
+<div class="card"><h2 style="margin-bottom:14px">🏆 Rezultat</h2><div class="scores" id="scores"></div></div>
+<div class="status" id="status">Igra počinje...</div>
+</aside>
+</div>
+</section>
+</div>
+<div id="roundModal" class="modal hidden"><div class="modal-card"><div style="font-size:38px">✨</div><div class="eyebrow">Runda završena</div><h2 id="modalTitle">Bravo!</h2><p style="color:var(--muted);font-size:13px">Skrivena fraza je bila:</p><div class="modal-answer" id="modalAnswer"></div><div id="modalScores" class="final-list"></div><button class="btn btn-primary btn-wide" id="nextBtn">Sljedeća runda →</button></div></div>
+<div id="toast" class="toast hidden"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+let state = null, myId = null, roomCode = null, maxPlayers = 2, wheelRotation = 0, toastTimer;
+const vowels = new Set(["A","E","I","O","U"]);
+const letters = "A B C Č Ć D Đ E F G H I J K L M N O P Q R S Š T U V W Z Ž".split(" ");
+const $ = id => document.getElementById(id);
+const show = id => $(id).classList.remove("hidden");
+const hide = id => $(id).classList.add("hidden");
+function toast(message){$("toast").textContent=message;show("toast");clearTimeout(toastTimer);toastTimer=setTimeout(()=>hide("toast"),2800)}
+socket.on("connect",()=>{$("connection").textContent="● Povezano";$("connection").style.color="var(--cyan)"});
+socket.on("disconnect",()=>{$("connection").textContent="● Prekinuta veza";$("connection").style.color="var(--pink)"});
+socket.on("toast",d=>toast(d.message));
+socket.on("joined",d=>{roomCode=d.code;myId=d.playerId;$("lobbyCode").textContent=d.code;showOnly("lobby")});
+socket.on("state",s=>{state=s;render()});
+function showOnly(which){["home","lobby","game"].forEach(x=>$(x).classList.toggle("hidden",x!==which));}
+document.querySelectorAll("[data-count]").forEach(b=>b.onclick=()=>{maxPlayers=Number(b.dataset.count);document.querySelectorAll("[data-count]").forEach(x=>x.classList.toggle("active",x===b))});
+$("createBtn").onclick=()=>socket.emit("createRoom",{name:$("createName").value,maxPlayers});
+$("joinBtn").onclick=()=>socket.emit("joinRoom",{name:$("joinName").value,code:$("roomCode").value});
+$("roomCode").addEventListener("input",e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,5));
+$("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(roomCode);toast("Kod sobe je kopiran!")}catch{toast("Kod sobe: "+roomCode)}};
+$("leaveBtn").onclick=()=>{location.reload()};
+$("startBtn").onclick=()=>socket.emit("startGame");
+$("spinBtn").onclick=()=>{socket.emit("spin");const turns=4+Math.random()*3;wheelRotation+=turns*360+Math.random()*360;$("wheel").style.transform=`rotate(${wheelRotation}deg)`};
+$("buyBtn").onclick=()=>{if(!state)return;const options=letters.filter(l=>vowels.has(l)&&!state.guessed.includes(l));if(!options.length)return toast("Nema više dostupnih samoglasnika.");const letter=prompt("Odaberi samoglasnik: "+options.join(" / "));if(letter)socket.emit("buyVowel",{letter:letter.trim().toUpperCase()})};
+$("passBtn").onclick=()=>socket.emit("passTurn");
+$("solveBtn").onclick=()=>{const answer=$("solveInput").value.trim();if(answer)socket.emit("solve",{answer})};
+$("solveInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("solveBtn").click()});
+$("nextBtn").onclick=()=>{hide("roundModal");socket.emit("nextRound")};
+function render(){
+ if(!state)return;
+ roomCode=state.code;$("lobbyCode").textContent=state.code;
+ if(state.status==="lobby"){showOnly("lobby");renderLobby();return}
+ if(state.status==="playing"||state.status==="roundOver"||state.status==="gameOver"){showOnly("game");renderGame()}
+}
+function renderLobby(){
+ $("lobbyCode").textContent=state.code;
+ $("lobbyPlayers").innerHTML="";
+ for(let i=0;i<state.maxPlayers;i++){const p=state.players[i];const el=document.createElement("div");el.className="player-tile"+(!p?" empty":"");el.innerHTML=p?`<div class="avatar">${p.id===state.hostId?"👑":"🙂"}</div><b>${esc(p.name)}${p.id===myId?" (ti)":""}</b><small>${p.id===state.hostId?"Domaćin":"Spreman/a"} · ${p.connected?"povezan/a":"odspojen/a"}</small>`:"<div>＋<br>Čeka se igrač";$("lobbyPlayers").appendChild(el)}
+ const full=state.players.length===state.maxPlayers;
+ $("lobbyInfo").textContent=full?"Svi igrači su tu! Domaćin može pokrenuti igru.":`Pridruženo ${state.players.length} od ${state.maxPlayers} igrača. Pošalji kod: ${state.code}`;
+ $("startBtn").disabled=state.hostId!==myId||!full;
+ $("startBtn").textContent=state.hostId===myId?"🎮 Pokreni igru":"Čekamo domaćina...";
+ $("copyBtn").classList.remove("hidden");
+}
+function renderGame(){
+ $("roundNum").textContent=state.round;$("roomTag").textContent="SOBA "+state.code;
+ const current=state.players.find(p=>p.id===state.currentPlayerId);
+ $("turnName").textContent=current?current.name+(current.id===myId?" (ti)":""):"—";
+ const isMyTurn=state.currentPlayerId===myId&&state.status==="playing";
+ $("turnBadge").textContent=isMyTurn?"TVOJ POTEZ":"PROTIVNIK IGRA";
+ $("turnBadge").style.color=isMyTurn?"var(--gold)":"var(--muted)";
+ $("category").textContent=state.category||"KATEGORIJA";
+ renderBoard();renderKeyboard();renderScores();
+ $("status").textContent=state.message||"";
+ $("spinBtn").disabled=!isMyTurn||!!state.wheelResult;
+ $("buyBtn").disabled=!isMyTurn||!!state.wheelResult||!state.canBuyVowel;
+ $("passBtn").disabled=!isMyTurn;
+ $("solveBtn").disabled=!isMyTurn||!!state.wheelResult;
+ $("solveInput").disabled=!isMyTurn||!!state.wheelResult;
+ if(state.wheelResult){$("wheelResult").textContent=state.wheelResult.label;$("wheelCaption").textContent=state.wheelResult.action==="bankrupt"?"Gubiš sve bodove!":state.wheelResult.action==="lose"?"Sljedeći igrač je na potezu.":state.wheelResult.action==="double"?"Sljedeće slovo vrijedi duplo!":"Odaberi suglasnik."}
+ else {$("wheelResult").textContent="Tvoj potez!";$("wheelCaption").textContent=isMyTurn?"Zavrti kolo da započneš.":"Čekaj svoj red."}
+ if(state.status==="roundOver"){show("roundModal");$("modalTitle").textContent=state.players.find(p=>p.id===state.winnerId)?.name+" je riješio/la!";$("modalAnswer").textContent=state.lastAction?.answer||state.masked.join("");$("modalScores").innerHTML=state.players.slice().sort((a,b)=>b.score-a.score).map(p=>`<div class="final-item"><span>${esc(p.name)}</span><b>${p.score} bod.</b></div>`).join("");$("nextBtn").textContent=state.round>=5?"🏆 Konačni rezultati":"Sljedeća runda →";$("nextBtn").disabled=state.hostId!==myId;$("nextBtn").onclick=()=>{hide("roundModal");socket.emit("nextRound")}}
+ else if(state.status==="gameOver"){show("roundModal");$("modalTitle").textContent=state.message;$("modalAnswer").textContent="KONAČNI REZULTATI";$("modalScores").innerHTML=(state.finalScores||[]).map((p,i)=>`<div class="final-item"><span>${i===0?"🏆 ":""}${esc(p.name)}</span><b>${p.score} bod.</b></div>`).join("");$("nextBtn").textContent="Igra završena";$("nextBtn").disabled=true}
+ else hide("roundModal");
+}
+function renderBoard(){
+ const board=$("board");board.innerHTML="";
+ const answer=state.masked||[];let word=document.createElement("div");word.className="word";
+ answer.forEach((ch,i)=>{if(ch===" "){if(word.children.length)board.appendChild(word);word=document.createElement("div");word.className="word";return}
+ const tile=document.createElement("div");tile.className="tile"+(ch==="_"?" blank":"")+(ch!=="_"?" revealed":"");tile.textContent=ch==="_"?"":ch;word.appendChild(tile)});
+ if(word.children.length)board.appendChild(word);
+}
+function renderKeyboard(){
+ const kb=$("keyboard");kb.innerHTML="";
+ letters.filter(l=>!vowels.has(l)).forEach(l=>{const b=document.createElement("button");b.className="key";b.textContent=l;b.disabled=state.guessed.includes(l)||state.status!=="playing"||state.currentPlayerId!==myId||!state.wheelResult;b.onclick=()=>socket.emit("guess",{letter:l});kb.appendChild(b)});
+}
+function renderScores(){
+ $("scores").innerHTML=state.players.slice().sort((a,b)=>b.score-a.score).map((p,i)=>`<div class="score-row ${p.id===state.currentPlayerId?"current":""}"><div class="score-avatar">${i===0&&p.score>0?"⭐":p.id===state.hostId?"👑":"🙂"}</div><div class="score-name">${esc(p.name)}${p.id===myId?" (ti)":""}</div><div class="score-points">${p.score.toLocaleString("bs-BA")}</div></div>`).join("");
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+const wheelTexts=["100","250","BANKROT","150","300","GUBI POTEZ","200","400","500","100","DUPLO","350"];
+wheelTexts.forEach((t,i)=>{const s=document.createElement("span");s.textContent=t;s.style.transform=`rotate(${i*30+15}deg) translateY(-${Math.min(window.innerWidth<700?96:112,window.innerWidth*.29)}px)`;$("wheelLabels").appendChild(s)});
+</script>
+</body></html>
