@@ -25,16 +25,19 @@ Najjednostavnije:
 Aplikacija koristi Socket.IO i mora biti hostovana kao Node web service (ne samo kao statična stranica na Netlifyju). Sobe su trenutno pohranjene u memoriji servera, pa se resetuju ako se server restartuje. Za mali privatni party ovo je jednostavno rješenje.
 
 ## Dodavanje fraza
-Sve fraze su u fajlu `phrases.js`. Dodaj frazu VELIKIM SLOVIMA u postojeću kategoriju (ili napravi novu kategoriju), pa `git push` — Render se sam ponovo objavi. `server.js` ne treba dirati.
+Sve fraze su u fajlu `phrases.js`. Dodaj frazu VELIKIM SLOVIMA u postojeću kategoriju (ili napravi novu kategoriju), pa `git push` — Render se sam ponovo objavi. `server.js` ne treba dirati. Fraze koje sadrže slova van bosanske abecede (Q, W, X, Y) ili posebne znakove server automatski preskače i ispiše upozorenje u logu.
 
 ## Pravila
 - Domaćin bira 2 ili 3 igrača; igra ne može početi dok se ne pridruži tačan broj.
-- Pet rundi, kategorije i fraze na BHS jezicima.
+- Domaćin bira broj rundi: 1, 3 ili 5 (pri pravljenju sobe, a može ga promijeniti i u lobbyju). Kategorije i fraze su na BHS jezicima.
 - Tačan suglasnik: broj pojavljivanja × vrijednost polja.
 - Samoglasnik se kupuje za 250 bodova.
 - Tačno rješenje: +500 bodova.
 - Bankrot briše trenutni rezultat igrača; Gubi potez preskače igrača; Duplo udvostručuje sljedeće tačno slovo.
-- Bodovi se prenose između rundi; najveći zbir nakon pet rundi pobjeđuje.
+- Bodovi se prenose između rundi; najveći zbir nakon posljednje runde pobjeđuje.
+- Ako igrači dobrovoljno preskoče potez 3 puta zaredom (bilo koji igrači, bez ijedne akcije između), runda se završava, prikaže se rješenje i prelazi se na sljedeću rundu bez pobjednika i bez bodova. Kolo, slovo, samoglasnik ili rješavanje vraćaju brojač na nulu.
+- Tastatura koristi bosansku abecedu bez Q, W, X i Y (DŽ, LJ i NJ se biraju kao dva slova).
+- Kad se igra završi, domaćin može sve vratiti u lobby (nova igra) ili svako može izaći na početnu stranicu.
 
 ## Napomene za prvu verziju
 - Ovo je igrivi MVP i treba ga testirati na ciljanoj platformi prije javnog korištenja.
