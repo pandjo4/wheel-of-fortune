@@ -24,6 +24,9 @@ Najjednostavnije:
 
 Aplikacija koristi Socket.IO i mora biti hostovana kao Node web service (ne samo kao statična stranica na Netlifyju). Sobe su trenutno pohranjene u memoriji servera, pa se resetuju ako se server restartuje. Za mali privatni party ovo je jednostavno rješenje.
 
+## Dodavanje fraza
+Sve fraze su u fajlu `phrases.js`. Dodaj frazu VELIKIM SLOVIMA u postojeću kategoriju (ili napravi novu kategoriju), pa `git push` — Render se sam ponovo objavi. `server.js` ne treba dirati.
+
 ## Pravila
 - Domaćin bira 2 ili 3 igrača; igra ne može početi dok se ne pridruži tačan broj.
 - Pet rundi, kategorije i fraze na BHS jezicima.

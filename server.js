@@ -2,51 +2,36 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const crypto = require("crypto");
+const path = require("path");
+const PHRASES = require("./phrases");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 app.get("/health", (_, res) => res.json({ ok: true, game: "Wheel of Fortune" }));
 
 const PORT = process.env.PORT || 3000;
 const rooms = new Map();
 const LETTERS = "ABCČĆDĐEFGHIJKLMNOPQRSŠTUVWZŽ";
 const VOWELS = new Set(["A","E","I","O","U"]);
+const SPIN_MS = 4200;
 const WHEEL = [
   { label: "100", value: 100, color: "#f6c453" },
   { label: "250", value: 250, color: "#29c4b7" },
-  { label: "BANKROT", action: "bankrupt", color: "#ef476f" },
-  { label: "150", value: 150, color: "#7c6cf2" },
+  { label: "BANKROT", action: "bankrupt", color: "#14111f", text: "#ff4d6d" },
+  { label: "150", value: 150, color: "#7c6cf2", text: "#fff" },
   { label: "300", value: 300, color: "#38a3ff" },
   { label: "GUBI POTEZ", action: "lose", color: "#ff8a4c" },
   { label: "200", value: 200, color: "#f6c453" },
   { label: "400", value: 400, color: "#29c4b7" },
-  { label: "500", value: 500, color: "#7c6cf2" },
+  { label: "500", value: 500, color: "#ef476f", text: "#fff" },
   { label: "100", value: 100, color: "#38a3ff" },
-  { label: "DUPLO", action: "double", color: "#ef476f" },
+  { label: "DUPLO", action: "double", color: "#8b5cf6", text: "#fff" },
   { label: "350", value: 350, color: "#ff8a4c" }
 ];
-const PUZZLES = [
-  ["IZREKE", "BEZ MUKE NEMA NAUKE"], ["IZREKE", "KO RANO RANI DVIJE SREĆE GRABI"],
-  ["IZREKE", "TIHA VODA BRIJEGE VALJA"], ["IZREKE", "JUTRO JE PAMETNIJE OD VEČERI"],
-  ["IZREKE", "BOLJE SPRIJEČITI NEGO LIJEČITI"], ["IZREKE", "SVAKA PTICA SVOME JATU LETI"],
-  ["IZREKE", "GDJE IMA DIMA IMA I VATRE"], ["IZREKE", "U LAŽI SU KRATKE NOGE"],
-  ["FILM I TV", "SAM U KUĆI"], ["FILM I TV", "IGRA PRIJESTOLJA"], ["FILM I TV", "PIRATI S KARIBA"],
-  ["FILM I TV", "POVRATAK U BUDUĆNOST"], ["FILM I TV", "GOSPODAR PRSTENOVA"],
-  ["HRANA", "PITA ISPOD SAČA"], ["HRANA", "DOMAĆI ĆEVAPI"], ["HRANA", "ČOKOLADNA TORTA"],
-  ["HRANA", "BEGOVA ČORBA"], ["HRANA", "PALAČINKE SA DŽEMOM"],
-  ["MJESTA", "STARI MOST U MOSTARU"], ["MJESTA", "PLITVIČKA JEZERA"], ["MJESTA", "SARAJEVO GRAD SULTANA"],
-  ["MJESTA", "JADRANSKO MORE"], ["MJESTA", "PIRAMIDE U GIZI"],
-  ["SVAKODNEVICA", "PUNJAČ ZA MOBITEL"], ["SVAKODNEVICA", "KLJUČEVI OD STANA"],
-  ["SVAKODNEVICA", "KASNO LIJEGANJE"], ["SVAKODNEVICA", "NEDJELJNA KAFA"],
-  ["SVAKODNEVICA", "IZGUBLJENE ČARAPE"], ["ŽIVOTINJE", "BIJELI NOSOROG"],
-  ["ŽIVOTINJE", "CRNA UDOVICA"], ["ŽIVOTINJE", "PLAVI KIT"], ["ŽIVOTINJE", "CRVENI PANDA"],
-  ["MUZIKA", "STARA DOBRA PJESMA"], ["MUZIKA", "KONCERT POD ZVIJEZDAMA"],
-  ["SPORT", "ZLATNA MEDALJA"], ["SPORT", "FUDBALSKA REPREZENTACIJA"],
-  ["IZREKE", "STRPLJEN SPAŠEN"], ["HRANA", "SUTLIJAŠ SA CIMETOM"],
-  ["MJESTA", "KRALJEVSKI DVORAC"], ["SVAKODNEVICA", "PONEDJELJAK UJUTRO"]
-];
+// Fraze se nalaze u phrases.js
+const PUZZLES = Object.entries(PHRASES).flatMap(([cat, list]) => list.map(t => [cat, t]));
 
 function cleanName(s) {
   return String(s || "").trim().replace(/\s+/g, " ").slice(0, 18);
@@ -62,12 +47,13 @@ function publicRoom(room) {
     category: room.puzzle ? room.puzzle.category : null,
     masked: room.puzzle ? [...room.puzzle.answer].map(ch => (ch === " " || ch === "-" || room.revealed.has(ch)) ? ch : "_") : [],
     guessed: room.puzzle ? [...room.guessed].sort() : [],
-    wheelResult: room.wheelResult, message: room.message, lastAction: room.lastAction,
+    wheelResult: room.wheelResult, spinning: !!room.spinning, wheelIndex: room.wheelIndex ?? null, message: room.message, lastAction: room.lastAction,
     winnerId: room.winnerId, finalScores: room.finalScores || null,
     canBuyVowel: !!room.puzzle && room.players.find(p => p.id === room.currentPlayerId)?.score >= 250
   };
 }
-function emitRoom(room) { io.to(room.code).emit("state", publicRoom(room)); }
+let actionSeq = 0;
+function emitRoom(room) { if (room.lastAction && !room.lastAction.id) room.lastAction.id = ++actionSeq; io.to(room.code).emit("state", publicRoom(room)); }
 function sendError(socket, message) { socket.emit("toast", { message }); }
 function player(room, id) { return room.players.find(p => p.id === id); }
 function nextTurn(room) {
@@ -75,6 +61,7 @@ function nextTurn(room) {
   const idx = room.players.findIndex(p => p.id === room.currentPlayerId);
   room.currentPlayerId = room.players[(idx + 1 + room.players.length) % room.players.length].id;
   room.wheelResult = null;
+  room.doubleNext = false;
 }
 function choosePuzzle(room) {
   let choices = PUZZLES.filter(p => !room.usedPuzzles.has(p[1]));
@@ -106,7 +93,7 @@ function allRevealed(room) {
 }
 function resolveGuess(room, socket, letter) {
   const p = player(room, socket.id);
-  if (!p || room.status !== "playing" || room.currentPlayerId !== socket.id || !room.wheelResult) return sendError(socket, "Prvo zavrti kolo pa odaberi slovo.");
+  if (!p || room.status !== "playing" || room.spinning || room.currentPlayerId !== socket.id || !room.wheelResult) return sendError(socket, "Prvo zavrti kolo pa odaberi slovo.");
   letter = normalize(letter);
   if (!LETTERS.includes(letter) || letter.length !== 1) return sendError(socket, "Odaberi važeće slovo.");
   if (room.guessed.has(letter)) return sendError(socket, "To slovo je već pokušano.");
@@ -129,6 +116,28 @@ function resolveGuess(room, socket, letter) {
   }
   emitRoom(room);
 }
+function finishSpin(room, pid, index) {
+  if (rooms.get(room.code) !== room || !room.spinning) return;
+  room.spinning = false;
+  const p = player(room, pid), item = WHEEL[index];
+  room.lastWheelValue = item.value || 0;
+  if (item.action === "bankrupt" || item.action === "lose") {
+    if (item.action === "bankrupt") p.score = 0;
+    nextTurn(room);
+    const nextName = player(room, room.currentPlayerId)?.name;
+    room.message = item.action === "bankrupt" ? `BANKROT! ${p.name} gubi sve bodove. Na potezu: ${nextName}.` : `GUBI POTEZ! ${p.name} preskače red. Na potezu: ${nextName}.`;
+    room.lastAction = { type: item.action, playerName: p.name, nextName };
+  } else if (item.action === "double") {
+    room.wheelResult = item; room.doubleNext = true; room.lastWheelValue = 200;
+    room.message = "DUPLO! Sljedeće tačno slovo vrijedi duplo (400 po slovu).";
+    room.lastAction = { type: "double", playerName: p.name };
+  } else {
+    room.wheelResult = item;
+    room.message = `Kolo je stalo na ${item.label}. Odaberi suglasnik.`;
+    room.lastAction = { type: "spinValue", value: item.value };
+  }
+  emitRoom(room);
+}
 function makeCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
@@ -136,6 +145,7 @@ function makeCode() {
   return code;
 }
 io.on("connection", socket => {
+  socket.emit("config", { wheel: WHEEL, spinMs: SPIN_MS });
   socket.on("createRoom", ({ name, maxPlayers }) => {
     maxPlayers = Number(maxPlayers);
     if (![2,3].includes(maxPlayers)) return sendError(socket, "Možeš izabrati tačno 2 ili 3 igrača.");
@@ -164,21 +174,14 @@ io.on("connection", socket => {
   });
   socket.on("spin", () => {
     const room = rooms.get(socket.data.roomCode);
-    if (!room || room.status !== "playing" || room.currentPlayerId !== socket.id) return sendError(socket, "Nije tvoj potez.");
+    if (!room || room.status !== "playing" || room.spinning || room.currentPlayerId !== socket.id) return sendError(socket, "Nije tvoj potez.");
     if (room.wheelResult) return sendError(socket, "Prvo odaberi slovo.");
-    const item = WHEEL[Math.floor(Math.random() * WHEEL.length)];
-    room.wheelResult = item;
-    room.lastWheelValue = item.value || 0;
-    room.lastAction = { type: "spin", result: item };
-    if (item.action === "bankrupt") {
-      const p = player(room, socket.id); p.score = 0; room.message = "BANKROT! Gubiš sve bodove iz ove runde.";
-      room.lastAction = { type: "bankrupt" }; nextTurn(room);
-    } else if (item.action === "lose") {
-      room.message = "Gubiš potez!"; room.lastAction = { type: "lose" }; nextTurn(room);
-    } else if (item.action === "double") {
-      room.doubleNext = true; room.lastWheelValue = 200; room.message = "DUPLO! Sljedeće tačno slovo vrijedi duplo.";
-    } else room.message = `Kolo je stalo na ${item.label}. Odaberi suglasnik.`;
+    const index = Math.floor(Math.random() * WHEEL.length);
+    room.spinning = true; room.wheelIndex = index;
+    room.message = `${player(room, socket.id).name} vrti kolo...`;
+    io.to(room.code).emit("spinStart", { index, ms: SPIN_MS });
     emitRoom(room);
+    setTimeout(() => finishSpin(room, socket.id, index), SPIN_MS + 150);
   });
   socket.on("guess", ({ letter }) => {
     const room = rooms.get(socket.data.roomCode);
@@ -187,7 +190,7 @@ io.on("connection", socket => {
   });
   socket.on("passTurn", () => {
     const room = rooms.get(socket.data.roomCode);
-    if (!room || room.status !== "playing" || room.currentPlayerId !== socket.id) return sendError(socket, "Nije tvoj potez.");
+    if (!room || room.status !== "playing" || room.spinning || room.currentPlayerId !== socket.id) return sendError(socket, "Nije tvoj potez.");
     room.wheelResult = null;
     room.doubleNext = false;
     room.message = `${player(room, socket.id)?.name || "Igrač"} je preskočio/la potez.`;
@@ -197,7 +200,7 @@ io.on("connection", socket => {
   });
   socket.on("buyVowel", ({ letter }) => {
     const room = rooms.get(socket.data.roomCode), p = room && player(room, socket.id);
-    if (!room || !p || room.status !== "playing" || room.currentPlayerId !== socket.id) return sendError(socket, "Nije tvoj potez.");
+    if (!room || !p || room.status !== "playing" || room.spinning || room.currentPlayerId !== socket.id) return sendError(socket, "Nije tvoj potez.");
     if (room.wheelResult) return sendError(socket, "Prvo završi potez na kolu.");
     if (p.score < 250) return sendError(socket, "Treba ti najmanje 250 bodova.");
     letter = normalize(letter);
@@ -216,14 +219,13 @@ io.on("connection", socket => {
   });
   socket.on("solve", ({ answer }) => {
     const room = rooms.get(socket.data.roomCode), p = room && player(room, socket.id);
-    if (!room || !p || room.status !== "playing" || room.currentPlayerId !== socket.id) return sendError(socket, "Nije tvoj potez.");
-    if (room.wheelResult) return sendError(socket, "Prvo odaberi slovo.");
+    if (!room || !p || room.status !== "playing" || room.spinning || room.currentPlayerId !== socket.id) return sendError(socket, "Nije tvoj potez.");
     if (normalize(answer).trim() === room.puzzle.answer) {
       p.score += 500;
       finishRound(room, p.id); room.message = `${p.name} je riješio/la frazu i osvaja 500 bonus bodova!`;
       room.lastAction = { type: "solve", answer: room.puzzle.answer, points: 500 };
     } else {
-      room.message = "Nije tačno! Gubiš potez."; room.lastAction = { type: "solveWrong" }; nextTurn(room);
+      room.message = "Nije tačno! Gubiš potez."; room.lastAction = { type: "solveWrong", playerName: p.name }; nextTurn(room);
     }
     emitRoom(room);
   });
