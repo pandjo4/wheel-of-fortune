@@ -55,7 +55,7 @@ function normalize(s) {
 function publicRoom(room) {
   return {
     code: room.code, status: room.status, maxPlayers: room.maxPlayers,
-    players: room.players.map(p => ({ id: p.id, name: p.name, score: p.score, connected: p.connected })),
+    players: room.players.map(p => ({ id: p.id, name: p.name, score: p.score, roundScore: p.roundScore || 0, connected: p.connected })),
     hostId: room.hostId, currentPlayerId: room.currentPlayerId, round: room.round, totalRounds: room.totalRounds,
     passStreak: room.passStreak, maxPassStreak: MAX_PASS_STREAK,
     category: room.puzzle ? room.puzzle.category : null,
@@ -63,7 +63,7 @@ function publicRoom(room) {
     guessed: room.puzzle ? [...room.guessed].sort() : [],
     wheelResult: room.wheelResult, spinning: !!room.spinning, wheelIndex: room.wheelIndex ?? null, message: room.message, lastAction: room.lastAction,
     winnerId: room.winnerId, finalScores: room.finalScores || null,
-    canBuyVowel: !!room.puzzle && room.players.find(p => p.id === room.currentPlayerId)?.score >= 250
+    canBuyVowel: !!room.puzzle && room.players.find(p => p.id === room.currentPlayerId)?.roundScore >= 250
   };
 }
 let actionSeq = 0;
@@ -103,11 +103,13 @@ function choosePuzzle(room) {
 function startGame(room) {
   room.status = "playing"; room.round = 0;
   room.winnerId = null; room.finalScores = null; room.passStreak = 0;
-  room.players.forEach(p => p.score = 0);
+  room.players.forEach(p => { p.score = 0; p.roundScore = 0; });
   room.currentPlayerId = room.hostId;
   choosePuzzle(room);
 }
 function finishRound(room, winnerId) {
+  if (room.status !== "playing") return;
+  room.players.forEach(p => { p.score += p.roundScore || 0; p.roundScore = 0; });
   room.status = "roundOver"; room.winnerId = winnerId;
   room.message = winnerId ? `${player(room, winnerId)?.name || "Igrač"} je riješio/la frazu!` : "Runda je završena.";
   room.lastAction = { type: "reveal", answer: room.puzzle.answer };
@@ -128,7 +130,7 @@ function resolveGuess(room, socket, letter) {
   room.wheelResult = null;
   if (count) {
     const multiplier = room.doubleNext ? 2 : 1;
-    p.score += count * room.lastWheelValue * multiplier;
+    p.roundScore = (p.roundScore || 0) + count * room.lastWheelValue * multiplier;
     room.doubleNext = false;
     room.revealed.add(letter);
     room.message = `Odlično! Slovo ${letter} pojavljuje se ${count} ${count === 1 ? "put" : "puta"}. +${count * room.lastWheelValue * multiplier} bodova.`;
@@ -147,10 +149,10 @@ function finishSpin(room, pid, index) {
   const p = player(room, pid), item = WHEEL[index];
   room.lastWheelValue = item.value || 0;
   if (item.action === "bankrupt" || item.action === "lose") {
-    if (item.action === "bankrupt") p.score = 0;
+    if (item.action === "bankrupt") p.roundScore = 0;
     nextTurn(room);
     const nextName = player(room, room.currentPlayerId)?.name;
-    room.message = item.action === "bankrupt" ? `BANKROT! ${p.name} gubi sve bodove. Na potezu: ${nextName}.` : `GUBI POTEZ! ${p.name} preskače red. Na potezu: ${nextName}.`;
+    room.message = item.action === "bankrupt" ? `BANKROT! ${p.name} gubi bodove iz ove runde, ali zadržava bodove iz prethodnih rundi. Na potezu: ${nextName}.` : `GUBI POTEZ! ${p.name} preskače red. Na potezu: ${nextName}.`;
     room.lastAction = { type: item.action, playerName: p.name, nextName };
   } else if (item.action === "double") {
     room.wheelResult = item; room.doubleNext = true; room.lastWheelValue = 200;
@@ -170,7 +172,7 @@ function finishSpin(room, pid, index) {
 function resetToLobby(room) {
   room.players = room.players.filter(p => p.connected);
   room.maxPlayers = Math.min(3, Math.max(2, room.players.length));
-  room.players.forEach(p => p.score = 0);
+  room.players.forEach(p => { p.score = 0; p.roundScore = 0; });
   if (!room.players.some(p => p.id === room.hostId) && room.players[0]) room.hostId = room.players[0].id;
   Object.assign(room, {
     status: "lobby", round: 0, puzzle: null, revealed: new Set(), guessed: new Set(),
@@ -220,7 +222,7 @@ io.on("connection", socket => {
     if (!ROUND_OPTIONS.includes(rounds)) return sendError(socket, "Možeš izabrati 1, 3 ili 5 rundi.");
     const code = makeCode();
     const room = { code, status: "lobby", maxPlayers, totalRounds: rounds, passStreak: 0, players: [], hostId: socket.id, currentPlayerId: null, round: 0, puzzle: null, revealed: new Set(), guessed: new Set(), usedPuzzles: new Set(), wheelResult: null, lastWheelValue: 0, doubleNext: false, message: "Čeka se da se igrači pridruže.", lastAction: null, winnerId: null, finalScores: null };
-    room.players.push({ id: socket.id, name: cleanName(name) || "Domaćin", score: 0, connected: true });
+    room.players.push({ id: socket.id, name: cleanName(name) || "Domaćin", score: 0, roundScore: 0, connected: true });
     rooms.set(code, room); socket.join(code); socket.data.roomCode = code;
     socket.emit("joined", { code, playerId: socket.id }); emitRoom(room);
   });
@@ -231,7 +233,7 @@ io.on("connection", socket => {
     if (room.status !== "lobby") return sendError(socket, "Igra je već počela.");
     if (room.players.length >= room.maxPlayers) return sendError(socket, "Soba je puna.");
     if (room.players.some(p => p.name.toLocaleLowerCase() === cleanName(name).toLocaleLowerCase())) return sendError(socket, "To ime je već zauzeto u sobi.");
-    room.players.push({ id: socket.id, name: cleanName(name) || `Igrač ${room.players.length+1}`, score: 0, connected: true });
+    room.players.push({ id: socket.id, name: cleanName(name) || `Igrač ${room.players.length+1}`, score: 0, roundScore: 0, connected: true });
     socket.join(code); socket.data.roomCode = code;
     socket.emit("joined", { code, playerId: socket.id }); room.message = `${room.players[room.players.length-1].name} se pridružio/la.`; emitRoom(room);
   });
@@ -291,11 +293,11 @@ io.on("connection", socket => {
     const room = rooms.get(socket.data.roomCode), p = room && player(room, socket.id);
     if (!room || !p || room.status !== "playing" || room.spinning || room.currentPlayerId !== socket.id) return sendError(socket, "Nije tvoj potez.");
     if (room.wheelResult) return sendError(socket, "Prvo završi potez na kolu.");
-    if (p.score < 250) return sendError(socket, "Treba ti najmanje 250 bodova.");
+    if ((p.roundScore || 0) < 250) return sendError(socket, "Treba ti najmanje 250 bodova u ovoj rundi.");
     letter = normalize(letter);
     if (!VOWELS.has(letter)) return sendError(socket, "Odaberi samoglasnik.");
     if (room.guessed.has(letter)) return sendError(socket, "To slovo je već pokušano.");
-    p.score -= 250; room.guessed.add(letter); room.passStreak = 0;
+    p.roundScore -= 250; room.guessed.add(letter); room.passStreak = 0;
     const count = [...room.puzzle.answer].filter(ch => ch === letter).length;
     if (count) {
       room.revealed.add(letter); room.message = `Samoglasnik ${letter} je u frazi!`;
@@ -311,7 +313,7 @@ io.on("connection", socket => {
     if (!room || !p || room.status !== "playing" || room.spinning || room.currentPlayerId !== socket.id) return sendError(socket, "Nije tvoj potez.");
     room.passStreak = 0;
     if (normalize(answer).trim() === room.puzzle.answer) {
-      p.score += 500;
+      p.roundScore = (p.roundScore || 0) + 500;
       finishRound(room, p.id); room.message = `${p.name} je riješio/la frazu i osvaja 500 bonus bodova!`;
       room.lastAction = { type: "solve", answer: room.puzzle.answer, points: 500 };
     } else {

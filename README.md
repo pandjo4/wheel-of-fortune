@@ -31,10 +31,10 @@ Sve fraze su u fajlu `phrases.js`. Dodaj frazu VELIKIM SLOVIMA u postojeću kate
 - Domaćin bira 2 ili 3 igrača; igra ne može početi dok se ne pridruži tačan broj.
 - Domaćin bira broj rundi: 1, 3 ili 5 (pri pravljenju sobe, a može ga promijeniti i u lobbyju). Kategorije i fraze su na BHS jezicima.
 - Tačan suglasnik: broj pojavljivanja × vrijednost polja.
-- Samoglasnik se kupuje za 250 bodova.
+- Samoglasnik se kupuje za 250 bodova iz tekuće runde.
 - Tačno rješenje: +500 bodova.
-- Bankrot briše trenutni rezultat igrača; Gubi potez preskače igrača; Duplo udvostručuje sljedeće tačno slovo.
-- Bodovi se prenose između rundi; najveći zbir nakon posljednje runde pobjeđuje.
+- Bankrot briše samo bodove osvojene u tekućoj rundi; prethodno osvojeni ukupni bodovi ostaju sačuvani. Gubi potez preskače igrača; Duplo udvostručuje sljedeće tačno slovo.
+- Na kraju svake runde, preostali bodovi te runde dodaju se ukupnom rezultatu. Najveći ukupni zbir nakon posljednje runde pobjeđuje.
 - Ako igrači dobrovoljno preskoče potez 3 puta zaredom (bilo koji igrači, bez ijedne akcije između), runda se završava, prikaže se rješenje i prelazi se na sljedeću rundu bez pobjednika i bez bodova. Kolo, slovo, samoglasnik ili rješavanje vraćaju brojač na nulu.
 - Tastatura koristi bosansku abecedu bez Q, W, X i Y (DŽ, LJ i NJ se biraju kao dva slova).
 - Kad se igra završi, domaćin može sve vratiti u lobby (nova igra) ili svako može izaći na početnu stranicu.
